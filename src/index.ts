@@ -1,140 +1,92 @@
 class School {
-  // any тому що массив
-  directions: any = [];
+  // implement 'add area', 'remove area', 'add lecturer', and 'remove lecturer' methods
 
-  // any так як має бути класс Direction
-  addDirection(direction: any): void {
-    this.directions.push(direction);
+  _areas = [];
+  _lecturers = []; // Name, surname, position, company, experience, courses, contacts
+
+  get areas() {
+    this._areas;
+  }
+
+  get lecturers() {
+    this._lecturers;
   }
 }
 
-class Direction {
-  // any тому що массив
-  levels: any = [];
-  _name: string;
+class Area {
+  // implement getters for fields and 'add/remove level' methods
+  _levels = [];
+  _name;
 
-  get name(): string {
-    return this._name;
-  }
-
-  constructor(name: string) {
+  constructor(name) {
     this._name = name;
-  }
-
-  // any так як має бути класс Level
-  addLevel(level: any): void {
-    this.levels.push(level);
   }
 }
 
 class Level {
-  // any тому що массив
-  groups: any = [];
-  _name: string;
-  _program: string;
+  // implement getters for fields and 'add/remove group' methods
 
-  constructor(name: string, program: string) {
-    this._name = name;
-    this._program = program;
-  }
+  _groups;
+  _name;
 
-  get name(): string {
-    return this._name;
-  }
-
-  get program(): string {
-    return this._program;
-  }
-
-  // any так як має бути класс Group
-  addGroup(group: any): void {
-    this.groups.push(group);
+  constructor(name, description) {
+    this.name = name;
+    this._description = description;
   }
 }
 
 class Group {
-  // any тому що массив
-  _students: any = [];
-  directionName: string;
-  levelName: string;
+  // implement getters for fields and 'add/remove student' and 'set status' methods
 
-  // any тому що повертає массив _students
-  get students(): any {
-    return this._students;
-  }
+  _area;
+  _status;
+  _students = []; // Modify the array so that it has a valid toSorted method*
 
-  constructor(directionName: string, levelName: string) {
+  constructor(directionName, levelName) {
     this.directionName = directionName;
     this.levelName = levelName;
   }
 
-  // any так як має бути класс Student
-  addStudent(student: any): void {
-    this._students.push(student);
-  }
-
-  // any тому що повертає відсортований массив _students
-  showPerformance(): any {
-    const sortedStudents = this.students.toSorted(
-    // any так як має бути екземпляр класу Student
-      (a: any, b: any) => b. getPerformanceRating() - a.getPerformanceRating()
-    );
-
+  showPerformance() {
+    const sortedStudents = this._students.toSorted((a, b) => b.getPerformanceRating() - a.getPerformanceRating());
     return sortedStudents;
   }
-
 }
 
 class Student {
-  // any тому що object
-  grades: any = {};
-  // any тому що массив
-  attendance: any = [];
-  firstName: string;
-  lastName: string;
-  birthYear: number;
+  // implement 'set grade' and 'set visit' methods
 
-  constructor(firstName: string, lastName: string, birthYear: number) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.birthYear = birthYear;
+  _firstName;
+  _lastName;
+  _birthYear;
+  _grades = []; // workName: mark
+  _visits = []; // lesson: present
+
+  constructor(firstName, lastName, birthYear) {
+    this._firstName = firstName;
+    this._lastName = lastName;
+    this._birthYear = birthYear;
   }
 
-  get fullName(): string {
-    return `${this.lastName} ${this.firstName}`;
+  get fullName() {
+    return `${this._lastName} ${this._firstName}`;
   }
 
-  set fullName(value: string) {
-    [this.lastName, this.firstName] = value.split(" ");
+  set fullName(value) {
+    [this._lastName, this._firstName] = value.split(' ');
   }
 
-  get age(): number {
-    return new Date().getFullYear() - this.birthYear;
+  get age() {
+    return new Date().getFullYear() - this._birthYear;
   }
 
-  // grade: number тому що як я зрозумів тут маєтся на увазі відмітка по предмету
-  setGrade(subject: string, grade: number): void {
-    this.grades[subject] = grade;
-  }
+  getPerformanceRating() {
+    const gradeValues = Object.values(this._grades);
 
-  markAttendance(present: boolean): void {
-    this.attendance.push(present);
-  }
+    if (!gradeValues.length) return 0;
 
-  getPerformanceRating(): number {
-    // any тому що массив
-    const gradeValues: any = Object.values(this.grades);
-
-    if (gradeValues.length === 0) return 0;
-
-    const averageGrade: number =
-      gradeValues.reduce((sum: number, grade: number): number => sum + grade, 0) / gradeValues.length;
-
-    const attendancePercentage: number =
-      // any тому що массив
-      (this.attendance.filter((present:boolean):any => present).length /
-        this.attendance.length) *
-      100;
+    const averageGrade = gradeValues.reduce((sum, grade) => sum + grade, 0) / gradeValues.length;
+    const attendancePercentage = (this._visits.filter(present => present).length / this._visits.length) * 100;
 
     return (averageGrade + attendancePercentage) / 2;
   }
