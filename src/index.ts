@@ -1,12 +1,13 @@
 type Lecturer = {
-  name: string
-  surname: string
+  firstName: string
+  lastName: string
   position: string
   company: string
   experiance: string[]
   courses: string[]
   contacts: (string | number)[]
 }
+type Fullname = `${string} ${string}`
 
 class School {
   // implement 'add area', 'remove area', 'add lecturer', and 'remove lecturer' methods
@@ -25,16 +26,22 @@ class School {
     this._areas.push(areaToAdd)
   }
 
-  removeArea(areaToRemove: Area): void {
-    this._areas = this._areas.filter((area: Area): boolean => area !== areaToRemove)
+  removeArea(areaToRemove: string): void {
+    this._areas = this._areas.filter(({name}: Area): boolean => name !== areaToRemove)
   }
 
   addLecturer(lecturerToAdd: Lecturer): void {
     this._lecturers.push(lecturerToAdd)
   }
 
-  removeLecturer(lecturerToRemove: Lecturer): void {
-    this._lecturers = this._lecturers.filter((lecturer: Lecturer): boolean => lecturer !== lecturerToRemove)
+  removeLecturer(lecturerToRemoveName: string, lecturerToRemoveSurname: string): void {
+    const lecturerToRemoveFullName: Fullname = `${lecturerToRemoveName} ${lecturerToRemoveSurname}` 
+
+    this._lecturers = this._lecturers.filter(({ firstName, lastName }: Lecturer): boolean => {
+      const lecturerFullname: Fullname = `${firstName} ${lastName}`
+
+      return lecturerFullname !== lecturerToRemoveFullName
+    })
   }
 }
 
@@ -59,8 +66,8 @@ class Area {
     this._levels.push(levelToAdd)
   }
 
-  removeLevel(levelToRemove: Level): void {
-    this._levels = this._levels.filter((level: Level): boolean => level !== levelToRemove)
+  removeLevel(levelToRemove: string): void {
+    this._levels = this._levels.filter(({name}: Level): boolean => name !== levelToRemove)
   }
 }
 
@@ -92,47 +99,58 @@ class Level {
     this._groups.push(groupToAdd)
   }
 
-  removeGroup(groupToRemove: Group): void {
-    this._groups = this._groups.filter((group: Group): boolean => group !== groupToRemove)
+  removeGroup(groupToRemove: Number): void {
+    this._groups = this._groups.filter(({groupNumber}: Group): boolean => groupNumber !== groupToRemove)
   }
 }
 
+enum ErrorMessages {
+  area = "There is no area selected",
+  status = "There is no status selected",
+  students = "There are no students yet"
+}
 class Group {
   // implement getters for fields and 'add/remove student' and 'set status' methods
 
   _area: Area | undefined;
   _status: string | undefined;
   _students: Student[] = []; // Modify the array so that it has a valid toSorted method*
+  // I add _groupNumber because there is any good indifacor for add/remove method of class Level
+  _groupNumber: number;
   directionName: string;
   levelName: typeof Level.name;
 
-  constructor(directionName: string, levelName: typeof Level.name) {
+  constructor(directionName: string, levelName: typeof Level.name, _groupNumber: number) {
     this.directionName = directionName;
     this.levelName = levelName;
+    this._groupNumber = _groupNumber
   }
-
-  get area(): Area | "There is no area selected"  {
+  get area(): Area | ErrorMessages.area  {
     if (this._area) {
       return this._area
     } else {
-      return "There is no area selected"
+      return ErrorMessages.area
     }
   }
 
-  get status(): string | "There is no status selected" {
+  get status(): string | ErrorMessages.status {
     if (this._status) {
       return this._status
     } else {
-      return "There is no status selected"
+      return ErrorMessages.status
     }
   }
 
-  get students(): Student[] | "There are no students yet" {
+  get students(): Student[] | ErrorMessages.students {
     if(this._students) {
     return this._students
     } else {
-      return "There are no students yet"
+      return ErrorMessages.students
     }
+  }
+
+  get groupNumber(): number {
+    return this._groupNumber
   }
 
   get direction(): string {
@@ -158,11 +176,12 @@ class Group {
     this._students.push(studentToAdd)
   }
 
-  removeStudent(studentToRemove: Student): void {
-    this._students = this._students.filter((student: Student): boolean => student !== studentToRemove)
+  removeStudent(studentToRemoveName: string, studentToRemoveSurname: string): void {
+    const studentToRemoveFullname: Fullname = `${studentToRemoveName} ${studentToRemoveSurname}`
+
+    this._students = this._students.filter((student: Student): boolean => student.fullName !== studentToRemoveFullname)
   }
 }
-
 type Grade = {
   workName: string
   mark: number
@@ -186,16 +205,24 @@ class Student {
     this._birthYear = birthYear;
   }
 
-  get fullName(): string {
+  get fullName(): Fullname {
     return `${this._lastName} ${this._firstName}`;
   }
 
-  set fullName(value: string) {
+  set fullName(value: Fullname) {
     [this._lastName, this._firstName] = value.split(' ');
   }
 
   get age(): number {
     return new Date().getFullYear() - this._birthYear;
+  }
+
+  set grade(grade: Grade) {
+    this._grades.push(grade)
+  }
+
+  set visit(visit: Visit) {
+    this._visits.push(visit)
   }
 
   getPerformanceRating(): number {
